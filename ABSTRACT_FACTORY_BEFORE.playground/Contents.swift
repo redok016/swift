@@ -168,3 +168,8 @@ hyundaiMotor.door = hyundaiDoor
 hyundaiDoor.open()
 hyundaiMotor.move(Direction.UP)
 
+/*
+- LG의 부품을 사용하는데 다른 제조 업체의 부품을 사용해야 한다면? (ex. LG 부품 대신 현대 부품을 사용해야하는 경우)
+- 새로운 업체의 부품을 지원해야 한다면? (ex. 삼성에서 엘레베이터 부품을 생산하기 시작해 삼성의 부품을 지원해야 하는 경우)
+*/
+
