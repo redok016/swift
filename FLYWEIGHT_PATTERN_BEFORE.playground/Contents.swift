@@ -71,6 +71,7 @@ let ss2 = Spreadsheet();
 ss2.setValue(Coordinate(col: "F", row: 10), value: 200);
 ss2.setValue(Coordinate(col: "G", row: 23), value: 250);
 print("SS2 Total: \(ss2.total)");
+print("Cells created: \( ss1.grid.count + ss2.grid.count)");
 
 // flyweight 패턴이 해결해줄 수 있는 부분 중에 하나가 동일한 많은 수의 객체를 생성할 때 메모리, 생성에 드는 시간을 줄이는 것이다.
 // 위 Spreadsheet 클래스를 생성할 때 마다 각 Spreadsheet 객체별로 위 컬렉션이 생성된다.

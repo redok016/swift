@@ -3,6 +3,15 @@
 import UIKit
 
 
+extension Dictionary {
+    init(setupFunc:(()-> [(Key, Value)])) {
+        self.init()
+        for item  in setupFunc() {
+            self[item.0] = item.1
+        }
+    }
+}
+
 func == (lhs: Coordinate, rhs: Coordinate) -> Bool {
     return lhs.col == rhs.col && lhs.row == rhs.row
 }
@@ -77,7 +86,7 @@ class FlyweightImpl: Flyweight {
     var total: Int {
         var result = 0;
         dispatch_sync(self.queue, {() in
-            result = self.extrinsicData.values.reduce(0, combine: {total, cell in
+            result = self.extrinsicData.values.reduce(0, combine: { (total, cell) in
                 if let intrinsicCell = self.instrinsicData[cell.coordinate] {
                     return total + intrinsicCell.value
                 } else {
@@ -96,3 +105,57 @@ class FlyweightImpl: Flyweight {
         return result
     }
 }
+
+class FlyweightFactory {
+    class func createFlyweight() -> Flyweight {
+        return FlyweightImpl(extrinsic: extrinsicData);
+    }
+
+    private class var extrinsicData:[Coordinate: Cell] {
+        get {
+            struct singletonWrapper {
+                static let singletonData = Dictionary<Coordinate, Cell> (
+                    setupFunc: {() in
+                        var results = [(Coordinate, Cell)]();
+                        let letters:String = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+                        var stringIndex = letters.startIndex;
+                        let rows = 50;
+                        repeat {
+                            let colLetter = letters[stringIndex];
+                            stringIndex = stringIndex.successor();
+                            for rowIndex in 1 ... rows {
+                                let cell = Cell(col: colLetter, row: rowIndex,
+                                    val: rowIndex);
+                                results.append((cell.coordinate, cell));
+                            }
+                        } while (stringIndex != letters.endIndex);
+                        return results;
+                    }
+                ); }
+            return singletonWrapper.singletonData;
+        }
+    }
+}
+
+class Spreadsheet {
+    var grid:Flyweight;
+    init() {
+        grid = FlyweightFactory.createFlyweight();
+    }
+    func setValue(coord: Coordinate, value:Int) {
+        grid[coord] = value;
+    }
+    var total:Int {
+        return grid.total;
+    }
+}
+
+let ss1 = Spreadsheet();
+ss1.setValue(Coordinate(col: "A", row: 1), value: 100);
+ss1.setValue(Coordinate(col: "J", row: 20), value: 200);
+print("SS1 Total: \(ss1.total)");
+let ss2 = Spreadsheet();
+ss2.setValue(Coordinate(col: "F", row: 10), value: 200);
+ss2.setValue(Coordinate(col: "G", row: 23), value: 250);
+print("SS2 Total: \(ss2.total)");
+print("Cells created: \( ss1.grid.count + ss2.grid.count)");
